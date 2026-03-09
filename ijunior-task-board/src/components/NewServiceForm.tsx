@@ -3,13 +3,12 @@ import type { Service } from "../App";
 
 type Props = {
     onAddService: (service:Service) => void;
-};
+}
 
 export default function NewServiceForm ({onAddService}: Props){
     const [clientName, setClientName] = useState("");
     const [deviceModel, setDeviceModel] = useState("");
     const [defect, setDefect] = useState("");
-    const [status, setStatus] = useState("");
 
     function handleSubmit (e: React.SyntheticEvent){
         e.preventDefault();
@@ -18,7 +17,7 @@ export default function NewServiceForm ({onAddService}: Props){
             clientName,
             deviceModel,
             defect,
-            status,
+            status:false
         };
 
         onAddService(newService);
@@ -26,17 +25,14 @@ export default function NewServiceForm ({onAddService}: Props){
         setClientName("");
         setDeviceModel("");
         setDefect("");
-        setStatus("");
     }
 
     return (
-        <form onSubmit={handleSubmit}>
-            <input placeholder='Nome do cliente' value={clientName} onChange={(e)=> setClientName(e.target.value)} />
-            <input placeholder='Modelo do aparelho' value={deviceModel} onChange={(e)=> setDeviceModel(e.target.value)} />
-            <input placeholder='Defeito' value={defect} onChange={(e)=> setDefect(e.target.value)} />
-            <input placeholder='status' value={status} onChange={(e)=> setStatus(e.target.value)} />        
-
-            <button type="submit">Adicionar</button> 
+        <form className = {"px-8 pb-6 flex w-1/2 justify-between"} onSubmit={handleSubmit}>
+            <input  className="border rounded px-2 py-1 bg-[#51615b] border-transparent" placeholder='Nome do cliente' value={clientName} onChange={(e)=> setClientName(e.target.value)} required/>
+            <input className="border rounded px-2 py-1 bg-[#51615b] border-transparent" placeholder='Modelo do aparelho' value={deviceModel} onChange={(e)=> setDeviceModel(e.target.value)} required/>
+            <input className="border rounded px-2 py-1 bg-[#51615b] border-transparent" placeholder='Defeito' value={defect} onChange={(e)=> setDefect(e.target.value)} required/>       
+            <button className="text-[#f06f6b] cursor-pointer hover:underline" type="submit">Adicionar</button> 
         </form>
     );
 }
