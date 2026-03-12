@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { Service } from "../App";
+import type { Service } from "../types/index"
 
 type Props = {
     onAddService: (service:Service) => void;
@@ -29,10 +29,10 @@ export default function NewServiceForm ({onAddService}: Props){
 
     return (
         <form className = {"px-8 pb-6 flex w-1/2 justify-between"} onSubmit={handleSubmit}>
-            <input  className="border rounded px-2 py-1 bg-[#51615b] border-transparent" placeholder='Nome do cliente' value={clientName} onChange={(e)=> setClientName(e.target.value)} required/>
-            <input className="border rounded px-2 py-1 bg-[#51615b] border-transparent" placeholder='Modelo do aparelho' value={deviceModel} onChange={(e)=> setDeviceModel(e.target.value)} required/>
-            <input className="border rounded px-2 py-1 bg-[#51615b] border-transparent" placeholder='Defeito' value={defect} onChange={(e)=> setDefect(e.target.value)} required/>       
-            <button className="text-[#f06f6b] cursor-pointer hover:underline" type="submit">Adicionar</button> 
+            <input  className="border rounded px-2 py-1 border-transparent" placeholder='Nome do cliente' value={clientName} onChange={(e)=> setClientName(e.target.value)} required/>
+            <input className="border rounded px-2 py-1  border-transparent" placeholder='Modelo do aparelho' value={deviceModel} onChange={(e)=> setDeviceModel(e.target.value)} required/>
+            <input className="border rounded px-2 py-1  border-transparent" placeholder='Defeito' value={defect} onChange={(e)=> setDefect(e.target.value)} required/>       
+            <button className="text-[#4161a5] cursor-pointer hover:underline" type="submit">Adicionar</button> 
         </form>
     );
 }
