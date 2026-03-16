@@ -1,6 +1,2 @@
-export type Service = {
-  clientName: string;
-  deviceModel: string;
-  defect: string;
-  status: boolean;
-};
+export * from './client';
+export * from './serviceOrder';

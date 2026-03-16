@@ -1,8 +1,10 @@
+import TaskCard from "../components/TaskCard";
 
 function InitialPage() {
     return(
         <div>
-            <h1 className = "px-10 ">Initial Page</h1>
+            <h2 className='flex justify-center text-4xl'>Página Inicial</h2>
+            <TaskCard/>
         </div>
     )
 }

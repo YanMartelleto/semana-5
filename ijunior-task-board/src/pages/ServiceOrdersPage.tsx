@@ -1,59 +1,66 @@
-import NewServiceForm from '../components/NewServiceForm';
-import TaskCard from '../components/TaskCard';
-import {useState} from "react";
-import type { Service } from "../types/index"
+import { useEffect, useState } from 'react';
+import { getAllOrders, deleteOrder } from '../service/serviceOrdersService';
+import type { ServiceOrder, Client } from '../types/index';
+import { getAllClients } from '../service/clientService'; 
+import NewOrderForm from '../components/NewServiceForm';
 
+const ServiceOrderPage = () => {
+  const [orders, setOrders] = useState<ServiceOrder[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
 
-function ServiceOrdersPage () {
+  useEffect(() => {
+  async function load() {
+    const ordersData = await getAllOrders();
+    const clientsData = await getAllClients();
 
-    const [services, setServices] = useState<Service[]>([]);
-  const [showForm, setShowForm] = useState(false);
+    setOrders(ordersData);
+    setClients(clientsData);
+  }
+  load();
+}, []);
 
-  function addService(service:Service){
-    setServices([...services, service]);
-    setShowForm(false);
+  async function handleDelete(id: number) {
+    await deleteOrder(id);
+    setOrders(prev => prev.filter(c => c.id !== id));
   }
 
-  function toggleStatus(index: number) {
-    setServices(
-      services.map((service, i) => {
-        if (i === index) {
-          return {
-            ...service,
-            status: !service.status
-          };
-        }
-        return service;
-      })
-    );
-    }
+  function handleOrderCreated(order: ServiceOrder) {
+    setOrders(prev => [...prev, order]);
+  }
 
-    return (
-        <div>
-        <menu className="flex gap-20">
-          {!showForm && (
-          <button onClick={() => setShowForm(true)} className="pl-8 pb-3 cursor-pointer hover:underline text-[#4161a5]">
-            Cadastrar novo serviço
-          </button>
-          )}
-          {showForm && (
-            <button className="pl-8 pb-3 cursor-pointer hover:underline text-[#4161a5]" onClick={() => setShowForm(false)}>
-               Cancelar
-            </button>
-          )}
-        </menu>
+  return (
+    <div>
+      <h2 className='flex justify-center text-4xl'>Ordens de serviço</h2>
 
-        <main>
-          {showForm&& (
-          <NewServiceForm onAddService={addService} />
-          )}
-          
-          {services.map((service, index) =>(
-           <TaskCard key={index} service={service} index={index} onToggleStatus={toggleStatus}/>
-          ))}
-        </main> 
-        </div> 
-    )
-}
+      <NewOrderForm clients={clients} onOrderCreated={handleOrderCreated} />
 
-export default ServiceOrdersPage;
+      <ul className='pt-3 flex flex-col gap-4'>
+       {orders.length === 0 ? (
+        <p className={"px-10"} >Nenhuma ordem cadastrada</p>
+          ) : (
+        orders.map(order => {
+          const client = clients.find(c => c.id === order.clientId);
+          console.log(order);
+
+          return (
+            <li className={"px-10"} key={order.id}>
+              <strong>Cliente:</strong> {client?.name} <br/>
+              <strong>Dispositivo:</strong> {order.device} <br/>
+              <strong>Problema:</strong> {order.issue} <br/>
+              <strong>Status:</strong> {order.status} <br/>
+
+              <button onClick={() => handleDelete(order.id)}>
+                Excluir
+              </button>
+            </li>
+            );
+        })
+      )}
+      </ul>
+
+
+    </div>
+  );
+};
+
+export default ServiceOrderPage;
