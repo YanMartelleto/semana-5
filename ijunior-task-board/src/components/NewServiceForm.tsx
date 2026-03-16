@@ -1,38 +1,71 @@
-import React, { useState } from 'react';
-import type { Service } from "../App";
+import { useState } from "react";
+import { createOrder } from "../service/serviceOrdersService";
+import type { Client, CreateServiceOrderData, ServiceOrder } from "../types";
 
 type Props = {
-    onAddService: (service:Service) => void;
+    clients: Client[];
+    onOrderCreated: (order: ServiceOrder) => void;
+};
+
+const NewOrderForm = ({ onOrderCreated, clients }: Props) => {
+  const [clientId, setClientId] = useState <number | null>(null);
+  const [device, setDevice] = useState("");
+  const [issue, setIssue] = useState("");
+  const [status, setStatus] = useState<"open" | "in_progress" | "done">("open");
+
+ async function handleSubmit(e: React.SyntheticEvent) {
+  e.preventDefault();
+
+  if (clientId === null) return;
+
+  const newOrder: CreateServiceOrderData = {
+    clientId,
+    device,
+    issue,
+    status: status as "open" | "in_progress" | "done",
+  };
+
+  const createdOrder = await createOrder(newOrder);
+
+  onOrderCreated(createdOrder);
+
+  setClientId(null);
+  setDevice("");
+  setIssue("");
 }
 
-export default function NewServiceForm ({onAddService}: Props){
-    const [clientName, setClientName] = useState("");
-    const [deviceModel, setDeviceModel] = useState("");
-    const [defect, setDefect] = useState("");
+  return (
+    <form className = {"px-5"} onSubmit={handleSubmit}>
+      <h3 className = {"pt-5"}>Nova ordem de serviço</h3>
 
-    function handleSubmit (e: React.SyntheticEvent){
-        e.preventDefault();
-    
-        const newService: Service = {
-            clientName,
-            deviceModel,
-            defect,
-            status:false
-        };
+      <div className="flex justify-around w-1/2">
+        <select className = {"hover:cursor-pointer"} value={clientId ?? ""} onChange={(e) => setClientId(Number(e.target.value))}>
+          <option value="">Selecione um cliente</option>
+          {clients.map(client => (
+            <option key={client.id} value={client.id}>
+              {client.name}
+            </option>
+          ))}
+        </select>
+        <input
+          placeholder="Dispositivo"
+          value={device}
+          onChange={(e) => setDevice(e.target.value)}
+        />
+        <input
+          placeholder="Problema"
+          value={issue}
+          onChange={(e) => setIssue(e.target.value)}
+        />
+        <select className = {"hover:cursor-pointer"} value={status} onChange={(e) => setStatus(e.target.value as "open" | "in_progress" | "done")}>
+          <option value="open"> Aberto</option>
+          <option value="in_progress"> Em progresso</option>
+          <option value="done"> Concluído</option>
+        </select>
+        <button className= "hover:cursor-pointer hover:underline text-blue-400" type="submit">Criar OS</button>
+      </div>
+    </form>
+  );
+};
 
-        onAddService(newService);
-        
-        setClientName("");
-        setDeviceModel("");
-        setDefect("");
-    }
-
-    return (
-        <form className = {"px-8 pb-6 flex w-1/2 justify-between"} onSubmit={handleSubmit}>
-            <input  className="border rounded px-2 py-1 bg-[#51615b] border-transparent" placeholder='Nome do cliente' value={clientName} onChange={(e)=> setClientName(e.target.value)} required/>
-            <input className="border rounded px-2 py-1 bg-[#51615b] border-transparent" placeholder='Modelo do aparelho' value={deviceModel} onChange={(e)=> setDeviceModel(e.target.value)} required/>
-            <input className="border rounded px-2 py-1 bg-[#51615b] border-transparent" placeholder='Defeito' value={defect} onChange={(e)=> setDefect(e.target.value)} required/>       
-            <button className="text-[#f06f6b] cursor-pointer hover:underline" type="submit">Adicionar</button> 
-        </form>
-    );
-}
+export default NewOrderForm;

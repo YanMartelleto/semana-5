@@ -1,12 +1,13 @@
-import { getAllOrders} from '../service/serviceOrdersService';
+import { useEffect, useState } from 'react';
+import { getAllOrders, deleteOrder } from '../service/serviceOrdersService';
 import type { ServiceOrder, Client } from '../types/index';
 import { getAllClients } from '../service/clientService'; 
-import { useEffect, useState } from 'react';
+import NewOrderForm from '../components/NewServiceForm';
 
-export default function TaskCard (){
+const ServiceOrderPage = () => {
   const [orders, setOrders] = useState<ServiceOrder[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
-  
+
   useEffect(() => {
   async function load() {
     const ordersData = await getAllOrders();
@@ -16,12 +17,24 @@ export default function TaskCard (){
     setClients(clientsData);
   }
   load();
-   }, []);
+}, []);
 
-   return (
-   <div>
-      
-      <ul className='pt-3 px-10 flex flex-col gap-4'>
+  async function handleDelete(id: number) {
+    await deleteOrder(id);
+    setOrders(prev => prev.filter(c => c.id !== id));
+  }
+
+  function handleOrderCreated(order: ServiceOrder) {
+    setOrders(prev => [...prev, order]);
+  }
+
+  return (
+    <div>
+      <h2 className='flex justify-center text-4xl'>Ordens de serviço</h2>
+
+      <NewOrderForm clients={clients} onOrderCreated={handleOrderCreated} />
+
+      <ul className='pt-3 flex flex-col gap-4'>
        {orders.length === 0 ? (
         <p className={"px-10"} >Nenhuma ordem cadastrada</p>
           ) : (
@@ -30,16 +43,24 @@ export default function TaskCard (){
           console.log(order);
 
           return (
-            <li className={` rounded w-1/4 ${order.status==="open" ? "bg-red-400" : order.status==="done" ? "bg-green-400" : "bg-gray-400"}  `} key={order.id}>
+            <li className={"px-10"} key={order.id}>
               <strong>Cliente:</strong> {client?.name} <br/>
               <strong>Dispositivo:</strong> {order.device} <br/>
               <strong>Problema:</strong> {order.issue} <br/>
+              <strong>Status:</strong> {order.status} <br/>
+
+              <button onClick={() => handleDelete(order.id)}>
+                Excluir
+              </button>
             </li>
             );
         })
       )}
       </ul>
 
-   </div>
-   )
-}
+
+    </div>
+  );
+};
+
+export default ServiceOrderPage;
